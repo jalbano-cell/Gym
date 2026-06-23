@@ -586,7 +586,13 @@ export default function Home() {
             </div>
           </div>
           <Separator className="bg-border mb-8" />
-          <p className="text-xs font-light text-muted-foreground">&copy; 2026 National Gym &amp; Fitness Centre. All rights reserved.</p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p className="text-xs font-light text-muted-foreground">&copy; 2026 National Gym &amp; Fitness Centre. All rights reserved.</p>
+            <p className="text-xs font-light text-muted-foreground">
+              Designed &amp; Managed by{" "}
+              <a href="https://vantamarketing.ca" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline underline-offset-2 transition-colors">Omnitiq Digital</a>
+            </p>
+          </div>
         </div>
       </footer>
 
