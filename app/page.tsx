@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -228,6 +228,7 @@ export default function Home() {
   const [aboutOpen, setAboutOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [activePlan, setActivePlan] = useState<string | null>(null);
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
   const plan = activePlan ? planDetails[activePlan] : null;
 
   useEffect(() => {
@@ -284,7 +285,7 @@ export default function Home() {
   return (
     <>
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-40 border-b border-border bg-[#0b0b0b]/88 backdrop-blur-md">
+      <nav className="fixed top-0 left-0 right-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Brand keeps Bebas Neue as a logo typeface */}
           <a href="#" className="font-['Bebas_Neue'] text-[22px] tracking-widest text-foreground no-underline">
@@ -484,9 +485,10 @@ export default function Home() {
         <div className="px-6 max-w-6xl mx-auto">
           <div className="grid grid-cols-4 auto-rows-[240px] gap-1">
             {galleryImages.map((img) => (
-              <div
+              <button
                 key={img.src}
-                className={`gsap-gallery relative overflow-hidden rounded-sm bg-card group ${img.large ? "col-span-2 row-span-2" : ""}`}
+                onClick={() => setLightbox({ src: img.src, alt: img.alt })}
+                className={`gsap-gallery relative overflow-hidden rounded-sm bg-card group cursor-zoom-in ${img.large ? "col-span-2 row-span-2" : ""}`}
               >
                 <Image
                   src={img.src}
@@ -495,10 +497,50 @@ export default function Home() {
                   sizes="(max-width:768px) 50vw, 25vw"
                   className="object-cover brightness-[0.85] group-hover:scale-[1.04] transition-transform duration-700"
                 />
-              </div>
+              </button>
             ))}
           </div>
         </div>
+
+        {/* Lightbox */}
+        <AnimatePresence>
+          {lightbox && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setLightbox(null)}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.92, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.92, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 340, damping: 28 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative max-w-5xl w-full max-h-[90vh] aspect-[4/3]"
+              >
+                <Image
+                  src={lightbox.src}
+                  alt={lightbox.alt}
+                  fill
+                  sizes="100vw"
+                  className="object-contain"
+                />
+              </motion.div>
+              <button
+                onClick={() => setLightbox(null)}
+                className="absolute top-5 right-5 text-white/70 hover:text-white transition-colors"
+                aria-label="Close"
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* Footer */}
