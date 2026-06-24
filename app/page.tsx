@@ -14,26 +14,31 @@ const amenities = [
   {
     title: "Free Weights",
     desc: "Dumbbells 5–150 lbs, barbells, and 6 Olympic lifting platforms with bumper plates.",
+    image: "/images/g8.webp",
     icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 4v16M18 4v16M2 8h4M18 8h4M2 16h4M18 16h4M6 12h12" /></svg>),
   },
   {
     title: "Cardio Floor",
     desc: "60+ machines including treadmills, rowers, bikes, and stair climbers with personal screens.",
+    image: "/images/g11.webp",
     icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>),
   },
   {
     title: "Sauna & Steam",
     desc: "Dedicated dry sauna and steam room for recovery. Available 7 days a week.",
+    image: "/images/amenity-sauna.jpg",
     icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 12h20M12 2a10 10 0 0 1 10 10M12 2a10 10 0 0 0-10 10" /><path d="M12 22a10 10 0 0 0 10-10M12 22a10 10 0 0 1-10-10" /></svg>),
   },
   {
     title: "Locker Rooms",
     desc: "Spacious change rooms with private showers, complimentary towel service, and secure lockers.",
+    image: "/images/amenity-locker.jpg",
     icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9h6M9 12h6M9 15h4" /></svg>),
   },
   {
     title: "Free Parking",
     desc: "150-spot private lot with direct access to the facility. No validation required.",
+    image: "/images/amenity-parking.jpg",
     icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8h6l2 5v3h-8V8zM5 19a2 2 0 1 0 4 0 2 2 0 0 0-4 0zM17 19a2 2 0 1 0 4 0 2 2 0 0 0-4 0z" /></svg>),
   },
 ];
@@ -367,7 +372,10 @@ export default function Home() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border border-border rounded-sm overflow-hidden [&>*]:border-r [&>*]:border-b [&>*:nth-child(5n)]:border-r-0 [&>*:nth-last-child(-n+5)]:border-b-0 border-border">
             {amenities.map((a) => (
-              <Card key={a.title} className="gsap-amenity rounded-none border-0 bg-card hover:bg-secondary transition-colors">
+              <Card key={a.title} className="gsap-amenity rounded-none border-0 bg-card hover:bg-secondary transition-colors overflow-hidden">
+                <div className="relative w-full h-44">
+                  <Image src={a.image} alt={a.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw" />
+                </div>
                 <CardContent className="p-7">
                   <div className="w-11 h-11 flex items-center justify-center border border-border rounded-sm mb-5 text-primary">{a.icon}</div>
                   <h3 className="text-sm font-semibold tracking-[-0.01em] text-foreground mb-2">{a.title}</h3>
@@ -408,7 +416,7 @@ export default function Home() {
                       <p className="text-2xl font-light text-foreground">{p.amount}<span className="text-sm text-muted-foreground ml-1">{p.period}</span></p>
                       <p className="text-xs font-light text-muted-foreground leading-[1.8]">{p.note}</p>
                       <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left" whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
-                      <MotionButton variant="outline" size="sm" className="border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
+                      <MotionButton variant="outline" size="sm" className="border-border text-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
                     </CardContent>
                   </Card>
                 ))}
@@ -436,7 +444,7 @@ export default function Home() {
                       <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left" whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
                       {p.featured
                         ? <MotionButton size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 mt-1">Get Started</MotionButton>
-                        : <MotionButton variant="outline" size="sm" className="border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
+                        : <MotionButton variant="outline" size="sm" className="border-border text-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
                       }
                     </CardContent>
                   </Card>
@@ -461,7 +469,7 @@ export default function Home() {
                       <p className="text-2xl font-light text-foreground">{p.amount}<span className="text-sm text-muted-foreground ml-1">{p.period}</span></p>
                       <p className="text-xs font-light text-muted-foreground leading-[1.8]">{p.note}</p>
                       <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left" whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
-                      <MotionButton variant="outline" size="sm" className="border-border hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
+                      <MotionButton variant="outline" size="sm" className="border-border text-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
                     </CardContent>
                   </Card>
                 ))}
@@ -590,7 +598,7 @@ export default function Home() {
             <p className="text-xs font-light text-muted-foreground">&copy; 2026 National Gym &amp; Fitness Centre. All rights reserved.</p>
             <p className="text-xs font-light text-muted-foreground">
               Designed &amp; Managed by{" "}
-              <a href="https://vantamarketing.ca" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline underline-offset-2 transition-colors">Omnitiq Digital</a>
+              <a href="https://omnigriddigital.ca" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline underline-offset-2 transition-colors">Omnigrid Digital</a>
             </p>
           </div>
         </div>
