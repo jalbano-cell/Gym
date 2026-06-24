@@ -480,6 +480,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Drop-In Registration Info */}
+      <section className="py-20 border-t border-border bg-primary">
+        <div className="max-w-6xl mx-auto px-6">
+          <h2 className="text-xl font-bold text-center text-primary-foreground mb-10 leading-snug">
+            Drop-In Registration Hours<br />(No Appointment Needed):
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+            <div className="text-center">
+              <p className="text-lg font-bold text-primary-foreground mb-2">Monday – Friday:</p>
+              <p className="text-sm font-light text-primary-foreground/80">11:30 am – 1:30 pm</p>
+              <p className="text-sm font-light text-primary-foreground/80">4:30 pm – 8:30 pm</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-primary-foreground mb-2">Saturday &amp; Sunday:</p>
+              <p className="text-sm font-light text-primary-foreground/80">11:30 am – 6:30 pm</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="text-center">
+              <p className="text-lg font-bold text-primary-foreground mb-2">Appointments Available</p>
+              <p className="text-sm font-light text-primary-foreground/80 leading-[1.8] max-w-sm mx-auto">Outside of our drop-in hours, please call (416)679-0990 to schedule an appointment. Yes, same-day appointments can be made. A one hour heads up should be sufficient.</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-primary-foreground mb-2">Day Pass Request?</p>
+              <p className="text-sm font-light text-primary-foreground/80 leading-[1.8] max-w-sm mx-auto">Yes, we do offer a day pass: $25.00. Please call (416)679-0990 to request a day pass. Government issued photo I.D. is required for check-in. Day pass requests are subject to approval.</p>
+              <p className="text-sm font-light text-primary-foreground/80 leading-[1.8] max-w-sm mx-auto mt-3">On date of purchase, your day pass payment may be applied towards a 1, 3, 6, or 12 month membership.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Gallery */}
       <section id="gallery" className="py-28 border-t border-border">
         <div className="max-w-6xl mx-auto px-6 mb-8">
