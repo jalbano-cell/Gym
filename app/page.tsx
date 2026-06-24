@@ -606,7 +606,7 @@ export default function Home() {
                   {hours.map(([day,time]) => (
                     <tr key={day}>
                       <td className="text-foreground font-normal pr-4 py-0.5 w-28">{day}</td>
-                      <td className="text-muted-foreground font-light py-0.5">{time}</td>
+                      <td className="text-muted-foreground font-light py-0.5 whitespace-nowrap">{time}</td>
                     </tr>
                   ))}
                 </tbody>
