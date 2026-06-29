@@ -32,7 +32,7 @@ const amenities = [
   {
     title: "Locker Rooms",
     desc: "Spacious change rooms with private showers, complimentary towel service, and secure lockers.",
-    image: "/images/amenity-locker.jpg",
+    image: "/images/amenity-locker-room.jpg",
     icon: (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9h6M9 12h6M9 15h4" /></svg>),
   },
   {
@@ -44,17 +44,17 @@ const amenities = [
 ];
 
 const galleryImages = [
-  { src: "/images/g1.webp", alt: "Main gym floor", large: true },
-  { src: "/images/g2.webp", alt: "Cable machines" },
-  { src: "/images/g3.webp", alt: "Free weight area" },
-  { src: "/images/g4.webp", alt: "Bench press stations" },
-  { src: "/images/g5.webp", alt: "Cardio and weight floor" },
-  { src: "/images/g6.webp", alt: "Treadmill row", large: true },
-  { src: "/images/g7.webp", alt: "Full gym floor view" },
-  { src: "/images/g8.webp", alt: "Leg press" },
-  { src: "/images/g9.webp", alt: "Machine section" },
+  { src: "/images/g1.webp",  alt: "Main gym floor",         large: true },
+  { src: "/images/g2.webp",  alt: "Cable machines" },
+  { src: "/images/g3.webp",  alt: "Free weight area" },
+  { src: "/images/g4.webp",  alt: "Bench press stations" },
+  { src: "/images/g5.webp",  alt: "Cardio and weight floor" },
+  { src: "/images/g6.webp",  alt: "Treadmill row",          large: true },
+  { src: "/images/g7.webp",  alt: "Full gym floor view" },
+  { src: "/images/g8.webp",  alt: "Leg press" },
+  { src: "/images/g9.webp",  alt: "Machine section" },
   { src: "/images/g10.webp", alt: "Squat racks" },
-  { src: "/images/g11.webp", alt: "Cardio equipment", large: true },
+  { src: "/images/g11.webp", alt: "Cardio equipment",       large: true },
   { src: "/images/g12.webp", alt: "Dumbbell racks" },
   { src: "/images/g13.webp", alt: "Cable area" },
   { src: "/images/g14.webp", alt: "Bikes and cardio" },
@@ -174,9 +174,20 @@ const hours = [
   ["Sunday",    "7:00 a.m. – 7:00 p.m."],
 ];
 
+const slideVariants = {
+  enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit:  (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0 }),
+};
+
+const navLinks = [
+  ["#amenities", "Amenities"],
+  ["#pricing",   "Memberships"],
+  ["#gallery",   "Facility"],
+] as const;
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-// Uppercase eyebrow label — wide tracking for premium feel
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-primary mb-3">
@@ -185,7 +196,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Section heading — Space Grotesk bold, tight tracking + tight line-height
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
     <h2 className="font-heading font-bold text-[clamp(36px,4.5vw,56px)] tracking-[-0.04em] leading-[1.1] text-foreground mb-4">
@@ -230,11 +240,17 @@ function Modal({ open, onClose, children }: { open: boolean; onClose: () => void
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const [aboutOpen, setAboutOpen] = useState(false);
+  const [aboutOpen,   setAboutOpen]   = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-  const [activePlan, setActivePlan] = useState<string | null>(null);
-  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+  const [activePlan,  setActivePlan]  = useState<string | null>(null);
+  const [lightbox,    setLightbox]    = useState<{ src: string; alt: string } | null>(null);
+  const [menuOpen,     setMenuOpen]     = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [slideDir,     setSlideDir]     = useState(1);
   const plan = activePlan ? planDetails[activePlan] : null;
+
+  const prevSlide = () => { setSlideDir(-1); setCurrentSlide((i) => (i - 1 + galleryImages.length) % galleryImages.length); };
+  const nextSlide = () => { setSlideDir(1);  setCurrentSlide((i) => (i + 1) % galleryImages.length); };
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -250,6 +266,12 @@ export default function Home() {
           ".gsap-hero-item",
           { y: 32, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.8, stagger: 0.13, ease: "power3.out", delay: 0.15 }
+        );
+        gsap.fromTo(
+          ".gsap-stat",
+          { y: 32, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.65, stagger: 0.12, ease: "power2.out",
+            scrollTrigger: { trigger: "#stats", start: "top 80%" } }
         );
         gsap.fromTo(
           ".gsap-amenity",
@@ -269,10 +291,22 @@ export default function Home() {
             scrollTrigger: { trigger: "#pricing", start: "top 72%" } }
         );
         gsap.fromTo(
+          ".gsap-dropin",
+          { y: 28, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, ease: "power2.out",
+            scrollTrigger: { trigger: "#dropin", start: "top 80%" } }
+        );
+        gsap.fromTo(
           ".gsap-gallery",
-          { opacity: 0, scale: 0.97 },
-          { opacity: 1, scale: 1, duration: 0.5, stagger: 0.05, ease: "power2.out",
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out",
             scrollTrigger: { trigger: "#gallery", start: "top 78%" } }
+        );
+        gsap.fromTo(
+          ".gsap-cta",
+          { y: 24, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.7, stagger: 0.1, ease: "power2.out",
+            scrollTrigger: { trigger: "#cta", start: "top 80%" } }
         );
         gsap.fromTo(
           ".gsap-footer",
@@ -287,17 +321,35 @@ export default function Home() {
     return () => { ctx?.revert(); };
   }, []);
 
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft")  { setSlideDir(-1); setCurrentSlide((i) => (i - 1 + galleryImages.length) % galleryImages.length); }
+      if (e.key === "ArrowRight") { setSlideDir(1);  setCurrentSlide((i) => (i + 1) % galleryImages.length); }
+    };
+    document.addEventListener("keydown", fn);
+    return () => document.removeEventListener("keydown", fn);
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setSlideDir(1);
+      setCurrentSlide((i) => (i + 1) % galleryImages.length);
+    }, 4000);
+    return () => clearInterval(id);
+  }, [currentSlide]);
+
   return (
     <>
-      {/* Nav */}
+      {/* ── Nav ── */}
       <nav className="fixed top-0 left-0 right-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Brand keeps Bebas Neue as a logo typeface */}
           <a href="#" className="font-['Bebas_Neue'] text-[22px] tracking-widest text-foreground no-underline">
             National Gym &amp; Fitness Centre
           </a>
+
+          {/* Desktop links */}
           <div className="hidden md:flex items-center gap-7">
-            {[["#amenities","Amenities"],["#pricing","Memberships"],["#gallery","Facility"]].map(([href,label]) => (
+            {navLinks.map(([href, label]) => (
               <motion.a
                 key={href}
                 href={href}
@@ -322,36 +374,85 @@ export default function Home() {
               Join Now
             </MotionButton>
           </div>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label="Toggle menu"
+            className="md:hidden w-9 h-9 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {menuOpen ? (
+                <motion.svg key="close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+                  initial={{ rotate: -45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 45, opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </motion.svg>
+              ) : (
+                <motion.svg key="open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"
+                  initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }} transition={{ duration: 0.15 }}>
+                  <path d="M4 6h16M4 12h16M4 18h16" />
+                </motion.svg>
+              )}
+            </AnimatePresence>
+          </button>
         </div>
+
+        {/* Mobile menu drawer */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="md:hidden overflow-hidden border-t border-border bg-background"
+            >
+              <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col gap-5">
+                {navLinks.map(([href, label]) => (
+                  <a key={href} href={href} onClick={() => setMenuOpen(false)}
+                    className="text-sm font-normal text-muted-foreground hover:text-foreground transition-colors">{label}</a>
+                ))}
+                <button onClick={() => { setAboutOpen(true); setMenuOpen(false); }}
+                  className="text-sm font-normal text-muted-foreground hover:text-foreground transition-colors text-left">About Us</button>
+                <button onClick={() => { setContactOpen(true); setMenuOpen(false); }}
+                  className="text-sm font-normal text-muted-foreground hover:text-foreground transition-colors text-left">Contact Us</button>
+                <div className="pt-1">
+                  <MotionButton href="#pricing" size="sm" onClick={() => setMenuOpen(false)}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold tracking-wide w-full">
+                    Join Now
+                  </MotionButton>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section className="relative min-h-screen flex items-center bg-cover bg-center" style={{ backgroundImage: "url('/images/g4.webp')" }}>
         <div className="absolute inset-0 bg-black/80" />
         <div className="relative z-10 max-w-6xl mx-auto px-6 pt-28 pb-20">
           <p className="gsap-hero-item text-[10px] font-semibold tracking-[0.35em] uppercase text-primary mb-6">
             Est. 1998 — Etobicoke, ON
           </p>
-          {/* Hero title: Space Grotesk 700, 80px, tight tracking, dramatic two-line break */}
           <h1 className="gsap-hero-item font-heading font-bold text-[clamp(52px,7.5vw,80px)] leading-[1.04] tracking-[-0.04em] text-foreground mb-8">
             Train Harder.<br />
             Live Better.
           </h1>
           <p className="gsap-hero-item text-base font-light text-muted-foreground max-w-xl leading-[1.8] mb-8">
-            Etobicoke &bull; Rexdale &bull; Malton&apos;s Trusted Gym for 27+ Years<br />
+            Etobicoke &bull; Rexdale &bull; Malton&apos;s Trusted Gym for 27+ Years.<br />
             Serving Toronto&apos;s Northwest Communities.
           </p>
-          <div className="gsap-hero-item grid grid-cols-2 gap-x-10 gap-y-2 max-w-lg mb-10">
+          <div className="gsap-hero-item flex flex-col gap-2.5 mb-10">
             {[
-              ["Real Gym • Real Equipment",          "No Contracts • No Sign-Up Fees"],
-              ["No Class Schedules • Train Any Time", "Cancel Any Time • No Headaches"],
-              ["Real Sauna • Lockers • Showers",      "Join Online in Minutes"],
-              ["Unlimited Gym Memberships Online",    "Start Training Today"],
-            ].map(([l,r],i) => (
-              <div key={i} className="contents">
-                <p className="text-[12px] font-light text-muted-foreground pl-3.5 relative before:absolute before:left-0 before:top-[8px] before:w-1 before:h-1 before:rounded-full before:bg-primary">{l}</p>
-                <p className="text-[12px] font-light text-muted-foreground pl-3.5 relative before:absolute before:left-0 before:top-[8px] before:w-1 before:h-1 before:rounded-full before:bg-primary">{r}</p>
-              </div>
+              "Real Equipment · No Crowding · Train Any Time",
+              "No Contracts · No Sign-Up Fees · Cancel Anytime",
+              "Sauna · Lockers · Showers · Free Parking",
+            ].map((line) => (
+              <p key={line} className="flex items-center gap-2.5 text-[12px] font-light text-muted-foreground">
+                <span className="w-1 h-1 rounded-full bg-primary flex-shrink-0" />
+                {line}
+              </p>
             ))}
           </div>
           <div className="gsap-hero-item">
@@ -362,7 +463,28 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Amenities */}
+      {/* ── Stats Strip ── */}
+      <section id="stats" className="border-b border-border bg-card">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border">
+            {[
+              { value: "27+",     label: "Years in Business",   sub: "Est. 1998, Etobicoke" },
+              { value: "10,000+", label: "Members Served",      sub: "And counting" },
+              { value: "7 Days",  label: "Open Every Week",     sub: "5 am – 10 pm weekdays" },
+            ].map((stat) => (
+              <div key={stat.label} className="gsap-stat text-center px-8 py-14">
+                <p className="font-heading font-bold text-[clamp(40px,4vw,56px)] tracking-[-0.04em] leading-none text-foreground mb-3">
+                  {stat.value}
+                </p>
+                <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-primary mb-1.5">{stat.label}</p>
+                <p className="text-xs font-light text-muted-foreground">{stat.sub}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Amenities ── */}
       <section id="amenities" className="py-28 border-t border-border">
         <div className="max-w-6xl mx-auto px-6">
           <div className="gsap-section-hdr mb-1"><SectionLabel>What&apos;s Included</SectionLabel></div>
@@ -370,11 +492,12 @@ export default function Home() {
           <p className="gsap-section-hdr text-sm font-light text-muted-foreground leading-[1.8] max-w-lg mb-16">
             Every membership includes full access to our premium facilities — no add-ons, no surprises.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border border-border rounded-sm overflow-hidden [&>*]:border-r [&>*]:border-b [&>*:nth-child(5n)]:border-r-0 [&>*:nth-last-child(-n+5)]:border-b-0 border-border">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 border border-border rounded-sm overflow-hidden [&>*]:border-r [&>*]:border-b [&>*:nth-child(5n)]:border-r-0 [&>*:nth-last-child(-n+5)]:border-b-0">
             {amenities.map((a) => (
               <Card key={a.title} className="gsap-amenity rounded-none border-0 bg-card hover:bg-secondary transition-colors overflow-hidden">
                 <div className="relative w-full h-44">
-                  <Image src={a.image} alt={a.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw" />
+                  <Image src={a.image} alt={a.title} fill className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 20vw" />
                 </div>
                 <CardContent className="p-7">
                   <div className="w-11 h-11 flex items-center justify-center border border-border rounded-sm mb-5 text-primary">{a.icon}</div>
@@ -387,7 +510,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Memberships */}
+      {/* ── Memberships ── */}
       <section id="pricing" className="py-28 border-t border-border bg-card">
         <div className="max-w-6xl mx-auto px-6">
           <div className="gsap-section-hdr mb-1"><SectionLabel>Memberships</SectionLabel></div>
@@ -396,17 +519,16 @@ export default function Home() {
             All plans include full facility access. No hidden fees.
           </p>
 
-          {/* Unified 3-column layout: Couples | Individual | Special Offers */}
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)] border border-border rounded-sm overflow-hidden divide-y lg:divide-y-0 lg:divide-x divide-border">
 
-            {/* ── Couples ── */}
+            {/* Couples */}
             <div className="flex flex-col">
               <div className="px-6 py-4 border-b border-border bg-secondary/40">
                 <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground">Couples</p>
               </div>
               <div className="flex flex-col divide-y divide-border flex-1">
                 {[
-                  { key:"couples1year",  name:"Couples — 1 Year",  amount:"CAD$1,198", period:"/pair", note:"Only $599 per person — unlimited access" },
+                  { key:"couples1year",  name:"Couples — 1 Year",   amount:"CAD$1,198", period:"/pair", note:"Only $599 per person — unlimited access" },
                   { key:"couples6month", name:"Couples — 6 Months", amount:"CAD$798",   period:"/pair", note:"Only $399 per person — unlimited access" },
                 ].map((p) => (
                   <Card key={p.key} className="gsap-price rounded-none border-0 bg-background flex-1">
@@ -415,7 +537,8 @@ export default function Home() {
                       <p className="font-heading font-bold text-lg tracking-[-0.03em] leading-tight text-foreground">{p.name}</p>
                       <p className="text-2xl font-light text-foreground">{p.amount}<span className="text-sm text-muted-foreground ml-1">{p.period}</span></p>
                       <p className="text-xs font-light text-muted-foreground leading-[1.8]">{p.note}</p>
-                      <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left" whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
+                      <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left cursor-pointer"
+                        whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
                       <MotionButton variant="outline" size="sm" className="border-border text-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
                     </CardContent>
                   </Card>
@@ -423,14 +546,14 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── Individual (2×2 inner grid) ── */}
+            {/* Individual */}
             <div className="flex flex-col">
               <div className="px-6 py-4 border-b border-border bg-secondary/40">
                 <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground">Individual</p>
               </div>
               <div className="grid grid-cols-2 flex-1 [&>*:nth-child(odd)]:border-r [&>*:nth-child(-n+2)]:border-b border-border">
                 {[
-                  { key:"1year",  badge:"Best Value", name:"1 Year",   amount:"CAD$699",    note:"$58/month — less than $2/day",  featured:true },
+                  { key:"1year",  badge:"Best Value", name:"1 Year",   amount:"CAD$699",    note:"$58/month — less than $2/day", featured: true },
                   { key:"6month",                     name:"6 Months", amount:"CAD$439.99", note:"$73/month — full access" },
                   { key:"3month",                     name:"3 Months", amount:"CAD$255.99", note:"$85/month — full access" },
                   { key:"1month",                     name:"1 Month",  amount:"CAD$87.99",  note:"Month-to-month — no commitment" },
@@ -441,7 +564,8 @@ export default function Home() {
                       <p className="font-heading font-bold text-lg tracking-[-0.03em] leading-tight text-foreground">{p.name}</p>
                       <p className="text-2xl font-light text-foreground">{p.amount}</p>
                       <p className="text-xs font-light text-muted-foreground leading-[1.8]">{p.note}</p>
-                      <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left" whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
+                      <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left cursor-pointer"
+                        whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
                       {p.featured
                         ? <MotionButton size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 mt-1">Get Started</MotionButton>
                         : <MotionButton variant="outline" size="sm" className="border-border text-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
@@ -452,7 +576,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ── Special Offers ── */}
+            {/* Special Offers */}
             <div className="flex flex-col">
               <div className="px-6 py-4 border-b border-border bg-secondary/40">
                 <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground">Special Offers</p>
@@ -468,7 +592,8 @@ export default function Home() {
                       <p className="font-heading font-bold text-lg tracking-[-0.03em] leading-tight text-foreground">{p.name}</p>
                       <p className="text-2xl font-light text-foreground">{p.amount}<span className="text-sm text-muted-foreground ml-1">{p.period}</span></p>
                       <p className="text-xs font-light text-muted-foreground leading-[1.8]">{p.note}</p>
-                      <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left" whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
+                      <motion.button onClick={() => setActivePlan(p.key)} className="text-xs font-normal text-primary text-left cursor-pointer"
+                        whileHover={{ x: 3 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>View Details →</motion.button>
                       <MotionButton variant="outline" size="sm" className="border-border text-white hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors mt-1">Get Started</MotionButton>
                     </CardContent>
                   </Card>
@@ -480,38 +605,56 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Drop-In Registration Info */}
-      <section className="py-20 border-t border-border bg-primary">
+      {/* ── Drop-In Registration — Redesigned ── */}
+      <section id="dropin" className="py-24 border-t border-border">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-xl font-bold text-center text-primary-foreground mb-10 leading-snug">
-            Drop-In Registration Hours<br />(No Appointment Needed):
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
-            <div className="text-center">
-              <p className="text-lg font-bold text-primary-foreground mb-2">Monday – Friday:</p>
-              <p className="text-sm font-light text-primary-foreground/80">11:30 am – 1:30 pm</p>
-              <p className="text-sm font-light text-primary-foreground/80">4:30 pm – 8:30 pm</p>
+          <div className="gsap-dropin grid grid-cols-1 lg:grid-cols-2 border border-border rounded-sm overflow-hidden bg-card">
+
+            {/* Hours */}
+            <div className="p-10 lg:p-14 border-b lg:border-b-0 lg:border-r border-border">
+              <SectionLabel>No Appointment Needed</SectionLabel>
+              <h2 className="font-heading font-bold text-[clamp(26px,3vw,36px)] tracking-[-0.04em] leading-[1.1] text-foreground mb-10">
+                Drop-In Registration Hours
+              </h2>
+              <div className="flex flex-col gap-8">
+                <div>
+                  <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-primary mb-2.5">Monday – Friday</p>
+                  <p className="text-sm font-light text-muted-foreground">11:30 am – 1:30 pm</p>
+                  <p className="text-sm font-light text-muted-foreground">4:30 pm – 8:30 pm</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-primary mb-2.5">Saturday &amp; Sunday</p>
+                  <p className="text-sm font-light text-muted-foreground">11:30 am – 6:30 pm</p>
+                </div>
+              </div>
             </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-primary-foreground mb-2">Saturday &amp; Sunday:</p>
-              <p className="text-sm font-light text-primary-foreground/80">11:30 am – 6:30 pm</p>
+
+            {/* Appointments & Day Pass */}
+            <div className="p-10 lg:p-14 flex flex-col gap-10">
+              <div>
+                <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-primary mb-3">Appointments Available</p>
+                <p className="text-sm font-light text-muted-foreground leading-[1.8]">
+                  Outside drop-in hours, call{" "}
+                  <a href="tel:4166790990" className="text-foreground hover:text-primary transition-colors">(416) 679-0990</a>{" "}
+                  to schedule. Same-day appointments welcome — one hour&apos;s notice is enough.
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold tracking-[0.28em] uppercase text-primary mb-3">Day Pass — $25</p>
+                <p className="text-sm font-light text-muted-foreground leading-[1.8]">
+                  Government-issued photo ID required. Your day pass payment may be applied toward any membership on the date of purchase.
+                </p>
+                <a href="tel:4166790990" className="inline-block mt-5 text-sm font-normal text-primary hover:opacity-75 transition-opacity">
+                  Call to Request →
+                </a>
+              </div>
             </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="text-center">
-              <p className="text-lg font-bold text-primary-foreground mb-2">Appointments Available</p>
-              <p className="text-sm font-light text-primary-foreground/80 leading-[1.8] max-w-sm mx-auto">Outside of our drop-in hours, please call (416)679-0990 to schedule an appointment. Yes, same-day appointments can be made. A one hour heads up should be sufficient.</p>
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-primary-foreground mb-2">Day Pass Request?</p>
-              <p className="text-sm font-light text-primary-foreground/80 leading-[1.8] max-w-sm mx-auto">Yes, we do offer a day pass: $25.00. Please call (416)679-0990 to request a day pass. Government issued photo I.D. is required for check-in. Day pass requests are subject to approval.</p>
-              <p className="text-sm font-light text-primary-foreground/80 leading-[1.8] max-w-sm mx-auto mt-3">On date of purchase, your day pass payment may be applied towards a 1, 3, 6, or 12 month membership.</p>
-            </div>
+
           </div>
         </div>
       </section>
 
-      {/* Gallery */}
+      {/* ── Gallery ── */}
       <section id="gallery" className="py-28 border-t border-border">
         <div className="max-w-6xl mx-auto px-6 mb-8">
           <div className="gsap-section-hdr mb-1"><SectionLabel>The Facility</SectionLabel></div>
@@ -521,21 +664,60 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="px-6 max-w-6xl mx-auto">
-          <div className="grid grid-cols-4 auto-rows-[240px] gap-1">
-            {galleryImages.map((img) => (
-              <button
-                key={img.src}
-                onClick={() => setLightbox({ src: img.src, alt: img.alt })}
-                className={`gsap-gallery relative overflow-hidden rounded-sm bg-card group cursor-zoom-in ${img.large ? "col-span-2 row-span-2" : ""}`}
+        <div className="gsap-gallery max-w-6xl mx-auto px-6">
+          {/* Main slide */}
+          <div className="relative aspect-video overflow-hidden rounded-sm bg-card">
+            <AnimatePresence custom={slideDir}>
+              <motion.div
+                key={currentSlide}
+                custom={slideDir}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="absolute inset-0 cursor-zoom-in"
+                onClick={() => setLightbox(galleryImages[currentSlide])}
               >
                 <Image
-                  src={img.src}
-                  alt={img.alt}
+                  src={galleryImages[currentSlide].src}
+                  alt={galleryImages[currentSlide].alt}
                   fill
-                  sizes="(max-width:768px) 50vw, 25vw"
-                  className="object-cover brightness-[0.85] group-hover:scale-[1.04] transition-transform duration-700"
+                  priority
+                  sizes="(max-width: 1200px) 100vw, 1152px"
+                  className="object-cover brightness-90"
                 />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Arrows */}
+            <button onClick={prevSlide} aria-label="Previous image"
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-black/60 hover:bg-black/80 border border-white/10 rounded-sm text-white transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15 18l-6-6 6-6" /></svg>
+            </button>
+            <button onClick={nextSlide} aria-label="Next image"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center bg-black/60 hover:bg-black/80 border border-white/10 rounded-sm text-white transition-colors">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 18l6-6-6-6" /></svg>
+            </button>
+
+            {/* Counter */}
+            <div className="absolute bottom-4 right-4 z-10 text-xs font-light text-white/70 bg-black/50 px-3 py-1.5 rounded-sm tabular-nums">
+              {currentSlide + 1} / {galleryImages.length}
+            </div>
+          </div>
+
+          {/* Thumbnail strip */}
+          <div className="flex gap-1 mt-1">
+            {galleryImages.map((img, i) => (
+              <button
+                key={img.src}
+                onClick={() => { setSlideDir(i > currentSlide ? 1 : -1); setCurrentSlide(i); }}
+                aria-label={img.alt}
+                className={`relative flex-shrink-0 overflow-hidden rounded-sm transition-opacity aspect-video w-[calc((100%-56px)/15)] ${
+                  i === currentSlide ? "ring-1 ring-primary opacity-100" : "opacity-40 hover:opacity-70"
+                }`}
+              >
+                <Image src={img.src} alt={img.alt} fill sizes="80px" className="object-cover" />
               </button>
             ))}
           </div>
@@ -545,34 +727,21 @@ export default function Home() {
         <AnimatePresence>
           {lightbox && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setLightbox(null)}
               className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
             >
               <motion.div
-                initial={{ scale: 0.92, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.92, opacity: 0 }}
+                initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 340, damping: 28 }}
                 onClick={(e) => e.stopPropagation()}
                 className="relative max-w-5xl w-full max-h-[90vh] aspect-[4/3]"
               >
-                <Image
-                  src={lightbox.src}
-                  alt={lightbox.alt}
-                  fill
-                  sizes="100vw"
-                  className="object-contain"
-                />
+                <Image src={lightbox.src} alt={lightbox.alt} fill sizes="100vw" className="object-contain" />
               </motion.div>
-              <button
-                onClick={() => setLightbox(null)}
-                className="absolute top-5 right-5 text-white/70 hover:text-white transition-colors"
-                aria-label="Close"
-              >
+              <button onClick={() => setLightbox(null)}
+                className="absolute top-5 right-5 text-white/70 hover:text-white transition-colors" aria-label="Close">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
@@ -582,8 +751,32 @@ export default function Home() {
         </AnimatePresence>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border bg-card py-20">
+      {/* ── CTA ── */}
+      <section id="cta" className="py-28 border-t border-border bg-card">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <p className="gsap-cta text-[10px] font-semibold tracking-[0.35em] uppercase text-primary mb-4">
+            Get Started Today
+          </p>
+          <h2 className="gsap-cta font-heading font-bold text-[clamp(40px,5.5vw,64px)] tracking-[-0.04em] leading-[1.06] text-foreground mb-6">
+            Your next workout<br />starts today.
+          </h2>
+          <p className="gsap-cta text-sm font-light text-muted-foreground max-w-md mx-auto leading-[1.8] mb-10">
+            No contracts. No hidden fees. Join online in minutes, or call us to get started.
+          </p>
+          <div className="gsap-cta flex flex-col sm:flex-row items-center justify-center gap-4">
+            <MotionButton href="#pricing" size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold tracking-wide">
+              View Membership Plans
+            </MotionButton>
+            <MotionButton variant="outline" size="lg" href="tel:4166790990"
+              className="border-border text-foreground hover:bg-secondary transition-colors">
+              (416) 679-0990
+            </MotionButton>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-border bg-background py-20">
         <div className="gsap-footer max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <div>
@@ -597,13 +790,15 @@ export default function Home() {
                 220 Humberline Drive Unit 12B<br />
                 Etobicoke, Ontario M9W 5Y4
               </p>
-              <a href="tel:4166790990" className="text-sm font-normal text-primary hover:opacity-75 transition-opacity">(416) 679-0990</a>
+              <a href="tel:4166790990" className="text-sm font-normal text-primary hover:opacity-75 transition-opacity mt-1 inline-block">
+                (416) 679-0990
+              </a>
             </div>
             <div>
               <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-primary mb-4">Hours</p>
               <table className="text-sm w-full">
                 <tbody>
-                  {hours.map(([day,time]) => (
+                  {hours.map(([day, time]) => (
                     <tr key={day}>
                       <td className="text-foreground font-normal pr-4 py-0.5 w-28">{day}</td>
                       <td className="text-muted-foreground font-light py-0.5 whitespace-nowrap">{time}</td>
@@ -615,10 +810,11 @@ export default function Home() {
             <div>
               <p className="text-[10px] font-semibold tracking-[0.35em] uppercase text-primary mb-4">Links</p>
               <div className="flex flex-col gap-2">
-                {[["#amenities","Amenities"],["#pricing","Memberships"],["#gallery","Facility"]].map(([href,label]) => (
+                {navLinks.map(([href, label]) => (
                   <a key={href} href={href} className="text-sm font-light text-muted-foreground hover:text-foreground transition-colors">{label}</a>
                 ))}
-                <button onClick={() => setContactOpen(true)} className="text-sm font-light text-muted-foreground hover:text-foreground transition-colors text-left">
+                <button onClick={() => setContactOpen(true)}
+                  className="text-sm font-light text-muted-foreground hover:text-foreground transition-colors text-left">
                   Contact Us
                 </button>
               </div>
@@ -629,13 +825,14 @@ export default function Home() {
             <p className="text-xs font-light text-muted-foreground">&copy; 2026 National Gym &amp; Fitness Centre. All rights reserved.</p>
             <p className="text-xs font-light text-muted-foreground">
               Designed &amp; Managed by{" "}
-              <a href="https://omnigriddigital.ca" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline underline-offset-2 transition-colors">Omnigrid Digital</a>
+              <a href="https://omnigriddigital.ca" target="_blank" rel="noopener noreferrer"
+                className="text-primary hover:underline underline-offset-2 transition-colors">Omnigrid Digital</a>
             </p>
           </div>
         </div>
       </footer>
 
-      {/* About Modal */}
+      {/* ── About Modal ── */}
       <Modal open={aboutOpen} onClose={() => setAboutOpen(false)}>
         <SectionLabel>About Us</SectionLabel>
         <h2 className="font-heading font-bold text-[clamp(28px,4vw,40px)] tracking-[-0.04em] leading-[1.1] text-foreground mb-2">
@@ -651,7 +848,7 @@ export default function Home() {
         </MotionButton>
       </Modal>
 
-      {/* Contact Modal */}
+      {/* ── Contact Modal ── */}
       <Modal open={contactOpen} onClose={() => setContactOpen(false)}>
         <SectionLabel>Contact Us</SectionLabel>
         <h2 className="font-heading font-bold text-[clamp(28px,4vw,40px)] tracking-[-0.04em] leading-[1.1] text-foreground mb-8">
@@ -665,18 +862,14 @@ export default function Home() {
           ].map((f) => (
             <div key={f.id} className="flex flex-col gap-2">
               <label htmlFor={f.id} className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground">{f.label}</label>
-              <input
-                id={f.id} type={f.type} placeholder={f.ph}
-                className="bg-secondary border border-border rounded-sm text-sm font-light text-foreground px-4 py-3 outline-none focus:border-primary transition-colors placeholder:text-muted-foreground"
-              />
+              <input id={f.id} type={f.type} placeholder={f.ph}
+                className="bg-secondary border border-border rounded-sm text-sm font-light text-foreground px-4 py-3 outline-none focus:border-primary transition-colors placeholder:text-muted-foreground" />
             </div>
           ))}
           <div className="flex flex-col gap-2">
             <label htmlFor="c-msg" className="text-[10px] font-semibold tracking-[0.35em] uppercase text-muted-foreground">Message</label>
-            <textarea
-              id="c-msg" rows={5} placeholder="How can we help?"
-              className="bg-secondary border border-border rounded-sm text-sm font-light text-foreground px-4 py-3 outline-none focus:border-primary transition-colors placeholder:text-muted-foreground resize-none"
-            />
+            <textarea id="c-msg" rows={5} placeholder="How can we help?"
+              className="bg-secondary border border-border rounded-sm text-sm font-light text-foreground px-4 py-3 outline-none focus:border-primary transition-colors placeholder:text-muted-foreground resize-none" />
           </div>
           <MotionButton type="submit" className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
             Send Message
@@ -684,7 +877,7 @@ export default function Home() {
         </form>
       </Modal>
 
-      {/* Plan Details Modal */}
+      {/* ── Plan Details Modal ── */}
       <Modal open={!!activePlan} onClose={() => setActivePlan(null)}>
         {plan && (
           <>
